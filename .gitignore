@@ -1,0 +1,6 @@
+**/bin/*
+**/obj/*
+.vs/
+
+Timesheet/.vs
+app.config
