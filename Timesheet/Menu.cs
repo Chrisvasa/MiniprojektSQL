@@ -13,8 +13,8 @@ namespace Timesheet
         int selectedIndex = 0; // Keeps track of menu positions
         ConsoleColor color = ConsoleColor.DarkYellow; // Color of the menu
         string output = string.Empty; // Output - Printed above the menu
-        private char selectedItem = '├'; // Char to show currently selected item in menu
-        private char item = '│'; // Char for the rest
+        private char selectedItem = '>'; // Char to show currently selected item in menu
+        private char item = ' '; // Char for the rest
 
         // Takes an array of strings on class instantiation
         public Menu() { }
