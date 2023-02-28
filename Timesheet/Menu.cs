@@ -13,7 +13,7 @@ namespace Timesheet
         int selectedIndex = 0; // Keeps track of menu positions
         ConsoleColor color = ConsoleColor.DarkYellow; // Color of the menu
         string output = string.Empty; // Output - Printed above the menu
-        private char selectedItem = '>'; // Char to show currently selected item in menu
+        private char selectedItem = '\u21aa'; // Char to show currently selected item in menu
         private char item = ' '; // Char for the rest
 
         // Takes an array of strings on class instantiation
@@ -104,6 +104,24 @@ namespace Timesheet
         public void MoveCursorTop()
         {
             Console.SetCursorPosition(0, 0);
+        }
+
+        public void ListToArray(List<PersonModel> items)
+        {
+            MenuItems = new string[items.Count];
+            for(int i = 0; i < items.Count; i++)
+            {
+                MenuItems[i] = items[i].person_name;
+            }
+        }
+
+        public void ListToArray(List<ProjectModel> items)
+        {
+            MenuItems = new string[items.Count];
+            for (int i = 0; i < items.Count; i++)
+            {
+                MenuItems[i] = items[i].project_name + " - " + items[i].project_time;
+            }
         }
 
         // A method that prints the menu when called
