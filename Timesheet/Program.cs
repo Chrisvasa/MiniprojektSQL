@@ -4,21 +4,18 @@ namespace Timesheet
 {
     internal class Program
     {
-        public static int selectedPerson = 0;
+        public static int selectedPerson = -1;
         static void Main(string[] args)
         {
-            List<PersonModel> personList = DataAccess.LoadPersons();
-            for(int i = 0; i < personList.Count; i++)
-            {
-                personList[i].projects = DataAccess.LoadProjects(personList[i].person_id);
-                Console.WriteLine(personList[i].person_id);
-                Console.WriteLine(personList[i].projects.Count);
-            }
-            Console.ReadKey();
             Menu MainMenu = new Menu(new string[] {"Användare", "Projekt", "Stäng ned programmet"}); // Creates the main menu
             MainMenu.Output = "Projekthanterare";
+            List<PersonModel> personList = LoadAll(MainMenu);
             while (true)
             {
+                if (selectedPerson >= 0)
+                {
+                    MainMenu.Output = $"Projekthanterare för {personList[selectedPerson].person_name}";
+                }
                 switch (MainMenu.UseMenu())
                 {
                     case 0:
@@ -31,6 +28,16 @@ namespace Timesheet
                         break;
                 }
             }
+        }
+
+        private static List<PersonModel> LoadAll(Menu MainMenu)
+        {
+            List<PersonModel> personList = DataAccess.LoadPersons();
+            for (int i = 0; i < personList.Count; i++)
+            {
+                personList[i].projects = DataAccess.LoadProjects(personList[i].person_id);
+            }
+            return personList;
         }
 
         private static void PersonTest(List<PersonModel> personList)
