@@ -19,10 +19,18 @@ namespace Timesheet
                 switch (MainMenu.UseMenu())
                 {
                     case 0:
-                        PersonTest(personList);
+                        SelectUser(personList);
                         break;
                     case 1:
-                        ProjectTest(personList[selectedPerson].projects);
+                        if (selectedPerson >= 0) 
+                        {
+                            //ProjectTest(personList[selectedPerson].projects); 
+                            Projects(personList[selectedPerson].projects);
+                        }
+                        else 
+                        { 
+                            Console.WriteLine("Vänligen välj en användare först!"); Console.ReadKey(); 
+                        }
                         break;
                     case 2:
                         break;
@@ -33,6 +41,7 @@ namespace Timesheet
         private static List<PersonModel> LoadAll(Menu MainMenu)
         {
             List<PersonModel> personList = DataAccess.LoadPersons();
+            // Fills the projects list in the PersonModel with corresponding projects
             for (int i = 0; i < personList.Count; i++)
             {
                 personList[i].projects = DataAccess.LoadProjects(personList[i].person_id);
@@ -40,7 +49,7 @@ namespace Timesheet
             return personList;
         }
 
-        private static void PersonTest(List<PersonModel> personList)
+        private static void SelectUser(List<PersonModel> personList)
         {
             Menu PersonMenu = new Menu(); // Initiates our Menu
             PersonMenu.ListToArray(personList); // Creates a menu from our List
@@ -50,12 +59,66 @@ namespace Timesheet
             Console.ReadKey();
         }
 
-        private static void ProjectTest(List<ProjectModel> ProjectList)
+        private static void Projects(List<ProjectModel> ProjectList)
+        {
+            Menu ProjectMenu = new Menu(new string[] {"Visa projekt", "Redigera projekt", "Lägg till projekt", "Ta bort projekt", "Gå tillbaka"});
+            bool showMenu = true;
+            while(showMenu)
+            {
+                int selectedOption = ProjectMenu.UseMenu();
+                if(selectedOption == ProjectMenu.MenuItems.Length) 
+                {
+                    int selectedProject = SelectProject(ProjectList);
+                    switch (selectedOption)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            EditProject(ProjectList[selectedProject]);
+                            break;
+                        case 2:
+                            AddProject(ProjectList[selectedProject]);
+                            break;
+                        case 3:
+                            RemoveProject(ProjectList[selectedProject]);
+                            break;
+                    }
+                }
+                else
+                {
+                    showMenu = false;
+                }
+            }
+        }
+
+        private static int SelectProject(List<ProjectModel> ProjectList)
         {
             Menu ProjectMenu = new Menu(); // Initiates our Menu
             ProjectMenu.ListToArray(ProjectList); // Creates a menu from our List
             ProjectMenu.Output = "Välj ett projekt från listan";
             int selectedProject = ProjectMenu.UseMenu(); // Uses menu and returns selected index from list
+            return selectedProject;
+        }
+
+        private static void EditProject(ProjectModel project)
+        {
+            // Redigera projekt
+            Console.WriteLine(project.project_name + " - " + project.project_time);
+            Console.ReadKey();
+        }
+
+        private static void AddProject(ProjectModel project)
+        {
+            // Lägg till projekt
+            Console.WriteLine(project.project_name + " - " + project.project_time);
+            Console.ReadKey();
+        }
+
+        private static void RemoveProject(ProjectModel project)
+        {
+            // Ta bort projekt
+            Console.WriteLine(project.project_name + " - " + project.project_time);
+            Console.ReadKey();
         }
     }
 }
