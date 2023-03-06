@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Timesheet
 {
-    internal class PersonModel
+    public class PersonModel
     {
-        public int id { get; set; }
         public int person_id { get; set; }
         public string person_name { get; set; }
         public List<ProjectModel> projects { get; set; }

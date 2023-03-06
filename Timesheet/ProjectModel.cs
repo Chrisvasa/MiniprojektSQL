@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Timesheet
 {
-    internal class ProjectModel
+    public class ProjectModel
     {
         public int id { get; set; }
         public int project_id { get; set; }

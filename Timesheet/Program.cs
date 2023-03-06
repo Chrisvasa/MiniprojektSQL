@@ -4,20 +4,28 @@ namespace Timesheet
 {
     internal class Program
     {
+        public static int selectedPerson = 0;
         static void Main(string[] args)
         {
-            List<PersonModel> PersonList = DataAccess.LoadPersons();
-            List<ProjectModel> ProjectList = DataAccess.LoadProjects();
-            Menu MainMenu = new Menu(new string[] {"Person", "Projekt", "Stäng ned programmet"});
-            while(true)
+            List<PersonModel> personList = DataAccess.LoadPersons();
+            for(int i = 0; i < personList.Count; i++)
+            {
+                personList[i].projects = DataAccess.LoadProjects(personList[i].person_id);
+                Console.WriteLine(personList[i].person_id);
+                Console.WriteLine(personList[i].projects.Count);
+            }
+            Console.ReadKey();
+            Menu MainMenu = new Menu(new string[] {"Användare", "Projekt", "Stäng ned programmet"}); // Creates the main menu
+            MainMenu.Output = "Projekthanterare";
+            while (true)
             {
                 switch (MainMenu.UseMenu())
                 {
                     case 0:
-                        PersonTest(PersonList);
+                        PersonTest(personList);
                         break;
                     case 1:
-                        ProjectTest(ProjectList);
+                        ProjectTest(personList[selectedPerson].projects);
                         break;
                     case 2:
                         break;
@@ -27,16 +35,20 @@ namespace Timesheet
 
         private static void PersonTest(List<PersonModel> personList)
         {
-            Menu PersonMenu = new Menu();
-            PersonMenu.ListToArray(personList);
-            PersonMenu.UseMenu();
+            Menu PersonMenu = new Menu(); // Initiates our Menu
+            PersonMenu.ListToArray(personList); // Creates a menu from our List
+            PersonMenu.Output = "Välj en person från listan";
+            selectedPerson = PersonMenu.UseMenu(); // Uses menu and returns selected index from list
+            Console.WriteLine(personList[selectedPerson].person_name);
+            Console.ReadKey();
         }
 
-        private static void ProjectTest(List<ProjectModel> projectList)
+        private static void ProjectTest(List<ProjectModel> ProjectList)
         {
-            Menu ProjectMenu = new Menu();
-            ProjectMenu.ListToArray(projectList);
-            ProjectMenu.UseMenu();
+            Menu ProjectMenu = new Menu(); // Initiates our Menu
+            ProjectMenu.ListToArray(ProjectList); // Creates a menu from our List
+            ProjectMenu.Output = "Välj ett projekt från listan";
+            int selectedProject = ProjectMenu.UseMenu(); // Uses menu and returns selected index from list
         }
     }
 }

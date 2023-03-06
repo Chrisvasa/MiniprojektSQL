@@ -17,12 +17,12 @@ namespace Timesheet
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
             {
-                var output = cnn.Query<PersonModel>($@"SELECT * FROM cva_person");
+                var output = cnn.Query<PersonModel>($@"SELECT id AS person_id, person_name FROM cva_person");
                 return output.ToList();
             }
         }
 
-        public static List<ProjectModel> LoadProjects()
+        public static List<ProjectModel> LoadProjects(int personID)
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
             {
@@ -35,7 +35,7 @@ namespace Timesheet
             FROM cva_project_person p
                 JOIN cva_project n ON n.id = p.project_id
             WHERE 
-                person_id='{2}'");
+                person_id='{personID}'");
                 return output.ToList();
             }
         }
