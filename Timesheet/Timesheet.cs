@@ -154,10 +154,47 @@ namespace Timesheet
         {
             // Redigera projekt
             // Låt användaren ändra ett befintligt projekt i DBn
-            Menu EditMenu = new Menu(new string[] { "Titel: " + project.project_name, "Arbetstimmar: " + project.project_time });
-            EditMenu.UseMenu();
-            Console.WriteLine(project.project_name + " - " + project.project_time);
-            Console.ReadKey();
+            Menu EditMenu = new Menu(new string[] { "Titel: " + project.project_name, "Arbetstimmar: " + project.project_time, "Spara ändringar" });
+            bool showMenu = true;
+            char answer = ' ';
+            string input = string.Empty; 
+            string hours = string.Empty;
+            while(showMenu)
+            {
+                EditMenu.PrintMenu();
+                switch (EditMenu.UseMenu())
+                {
+                    case 0:
+                        EditMenu.SetMenuItem("Titel: ", 0);
+                        EditMenu.PrintMenu();
+                        EditMenu.MoveCursorRight();
+                        input = Console.ReadLine();
+                        EditMenu.SetMenuItem("Titel: " + input, 0);
+                        break;
+                    case 1:
+                        EditMenu.SetMenuItem("Arbetstimmar: ", 1);
+                        EditMenu.PrintMenu();
+                        EditMenu.MoveCursorRight();
+                        hours = Console.ReadLine();
+                        EditMenu.SetMenuItem("Arbetstimmar: " + hours, 1);
+                        break;
+                    case 2:
+                        while(answer != 'y' || answer != 'Y' || answer != 'n' || answer != 'N')
+                        {
+                            Console.WriteLine("Vill du spara dina ändringar? Y/N");
+                            answer = Console.ReadKey(true).KeyChar;
+                        }
+                        showMenu = false;
+                        break;
+                }
+            }
+            if(answer == 'Y' || answer == 'y')
+            {
+                project.project_name = input;
+                project.project_time = hours;
+                Console.WriteLine("Dina ändringar har sparats.");
+                Console.ReadKey();
+            }
         }
 
         private static void AddProject()
