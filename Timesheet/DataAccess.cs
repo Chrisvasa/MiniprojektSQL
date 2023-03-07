@@ -13,6 +13,7 @@ namespace Timesheet
 {
     internal class DataAccess
     {
+        // Loads id and name from the person table
         public static List<PersonModel> LoadPersons()
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
@@ -21,7 +22,7 @@ namespace Timesheet
                 return output.ToList();
             }
         }
-
+        // Loads id, project id, project name and the project time from the project table
         public static List<ProjectModel> LoadProjects(int personID)
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))

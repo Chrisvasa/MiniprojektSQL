@@ -11,7 +11,7 @@ namespace Timesheet
     {
         string[] menuItems = Array.Empty<string>(); // MenuArray initialization
         int selectedIndex = 0; // Keeps track of menu positions
-        ConsoleColor color = ConsoleColor.DarkYellow; // Color of the menu
+        ConsoleColor color = ConsoleColor.DarkGreen; // Color of the menu
         string output = string.Empty; // Output - Printed above the menu
         private char selectedItem = '\u21aa'; // Char to show currently selected item in menu
         private char item = ' '; // Char for the rest
@@ -106,7 +106,7 @@ namespace Timesheet
             Console.SetCursorPosition(0, 0);
         }
 
-        public void ListToArray(List<PersonModel> items)
+        public void CreatePersonMenu(List<PersonModel> items)
         {
             MenuItems = new string[items.Count];
             for(int i = 0; i < items.Count; i++)
@@ -115,12 +115,12 @@ namespace Timesheet
             }
         }
 
-        public void ListToArray(List<ProjectModel> items)
+        public void CreateProjectMenu(List<ProjectModel> items)
         {
             MenuItems = new string[items.Count];
             for (int i = 0; i < items.Count; i++)
             {
-                MenuItems[i] = items[i].project_name + " - " + items[i].project_time;
+                MenuItems[i] = String.Format("|{0,-15}|{1,0}|", items[i].project_name, items[i].project_time + "h");
             }
         }
 
