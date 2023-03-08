@@ -11,7 +11,7 @@ namespace Timesheet
         public int id { get; set; }
         public int project_id { get; set; }
         public string project_name { get; set; }
-        public string project_time { get; set; }
+        public int project_time { get; set; }
 
     }
 }

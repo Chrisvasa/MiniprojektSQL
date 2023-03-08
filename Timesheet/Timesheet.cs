@@ -26,15 +26,7 @@ namespace Timesheet
                         Users();
                         break;
                     case 1:
-                        if (selectedPerson >= 0)
-                        {
-                            Projects(personList[selectedPerson].projects);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Vänligen välj en användare först!"); 
-                            Console.ReadKey();
-                        }
+                        ProjectsMenu();
                         break;
                     case 2:
                         Console.WriteLine("Du har avslutat programmet. Hejdå!");
@@ -52,7 +44,52 @@ namespace Timesheet
             {
                 personList[i].projects = DataAccess.LoadProjects(personList[i].person_id);
             }
+            SortList();
             return personList;
+        }
+
+        private static void SortList()
+        {
+            foreach (PersonModel person in personList)
+            {
+                personList.OrderBy(person => person.person_id);
+            }
+        }
+
+        private static void Users()
+        {
+            SortList();
+            Menu UserMenu = new Menu(new string[] {"Välj användare", "Redigera användare", "Skapa användare", "Ta bort användare", "Gå tillbaka"});
+            bool showMenu = true;
+            while (showMenu)
+            {
+                if(selectedPerson >= 0)
+                {
+                    UserMenu.SetMenuItem("Byt Användare", 0);
+                }
+                else
+                {
+                    UserMenu.SetMenuItem("Välj användare", 0);
+                }
+                switch(UserMenu.UseMenu())
+                {
+                    case 0:
+                        SelectUser();
+                        break;
+                    case 1:
+                        EditUser();
+                        break;
+                    case 2:
+                        CreateUser();
+                        break;
+                    case 3:
+                        DeleteUser();
+                        break;
+                    case 4:
+                        showMenu = false;
+                        break;
+                }
+            }
         }
 
         private static void SelectUser()
@@ -63,31 +100,97 @@ namespace Timesheet
             selectedPerson = PersonMenu.UseMenu(); // Uses menu and returns selected index from list
         }
 
-        private static void Users()
+        private static void CreateUser()
         {
-            Menu UserMenu = new Menu(new string[] {"Välj användare", "Redigera användare", "Skapa användare", "Ta bort användare", "Gå tillbaka"});
-            bool showMenu = true;
-            while (showMenu)
+            do
             {
-                if(selectedPerson >= 0)
+                Console.Clear();
+                Console.WriteLine("Var vänlig och skapa en ny användare.");
+                Console.Write("Namn: ");
+                string userName = Helper.FormatString(Console.ReadLine());
+                if (Helper.isValid(userName))
                 {
-                    UserMenu.SetMenuItem("Byt Användare", 0);
+                    Console.WriteLine($"Du skrev in {userName} - Ser detta rätt ut? Y/N");
+                    if(Helper.Confirm())
+                    {
+                        DataAccess.CreateUser(userName);
+                        Console.WriteLine($"Användaren med namnet {userName} har skapats.");
+                        Console.ReadKey();
+                        selectedPerson = -1;
+                        personList = LoadAll();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Användaren har inte skapats.");
+                        Console.ReadKey();
+                    }
+                    break;
                 }
-                switch(UserMenu.UseMenu())
+                else
                 {
-                    case 0:
-                        SelectUser();
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        showMenu = false;
-                        break;
+                    Console.WriteLine("Vänligen ange endast bokstäver i ditt namn. Försök igen.");
+                    Console.ReadKey();
                 }
+            } while (true);
+        }
+
+        private static void EditUser()
+        {
+            if(selectedPerson == -1)
+            {
+                SelectUser();
+            }
+            Console.WriteLine($"Vill du ändra på namnet {personList[selectedPerson].person_name}? Y/N");
+            if(Helper.Confirm()) 
+            {
+                Console.Write("Skriv in det nya namnet: ");
+                string userName = Helper.FormatString(Console.ReadLine());
+                Console.WriteLine($"Ditt nya namn kommer bli {userName} - Ser detta bra ut? Y/N");
+                if (Helper.isValid(userName) && Helper.Confirm())
+                {
+                    personList[selectedPerson].person_name = userName;
+                    DataAccess.EditUser(personList[selectedPerson]);
+                    Console.WriteLine("Namnet har ändrats.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.WriteLine("Inga ändringar har skett.");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        private static void DeleteUser()
+        {
+            if (selectedPerson == -1)
+            {
+                SelectUser();
+            }
+            Console.WriteLine($"Vill du ta bort {personList[selectedPerson].person_name} som användare? Y/N");
+            if (Helper.Confirm())
+            {
+                Console.WriteLine("Är du helt säker? Detta sker permanent. Y/N");
+                if(Helper.Confirm())
+                {
+                    DataAccess.DeleteUser(personList[selectedPerson]);
+                    selectedPerson = -1;
+                    personList = LoadAll();
+                }
+            }
+        }
+
+        private static void ProjectsMenu()
+        {
+            SortList();
+            if (selectedPerson >= 0)
+            {
+                Projects(personList[selectedPerson].projects);
+            }
+            else
+            {
+                Console.WriteLine("Vänligen välj en användare först!");
+                Console.ReadKey();
             }
         }
 
@@ -156,7 +259,7 @@ namespace Timesheet
             // Låt användaren ändra ett befintligt projekt i DBn
             Menu EditMenu = new Menu(new string[] { "Titel: " + project.project_name, "Arbetstimmar: " + project.project_time, "Spara ändringar" });
             bool showMenu = true;
-            char answer = ' ';
+            bool confirmation = false;
             string input = string.Empty; 
             string hours = string.Empty;
             while(showMenu)
@@ -179,20 +282,29 @@ namespace Timesheet
                         EditMenu.SetMenuItem("Arbetstimmar: " + hours, 1);
                         break;
                     case 2:
-                        while(answer != 'y' || answer != 'Y' || answer != 'n' || answer != 'N')
-                        {
-                            Console.WriteLine("Vill du spara dina ändringar? Y/N");
-                            answer = Console.ReadKey(true).KeyChar;
-                        }
+                        Console.WriteLine("Vill du spara dina ändringar? Y/N");
+                        confirmation = Helper.Confirm();
                         showMenu = false;
                         break;
                 }
             }
-            if(answer == 'Y' || answer == 'y')
+            if(confirmation == true)
             {
-                project.project_name = input;
-                project.project_time = hours;
+                if(input.Length > 0)
+                {
+                    project.project_name = Helper.FormatString(input);
+                }
+                if(hours.Length > 0)
+                {
+                    project.project_time = int.Parse(hours);
+                }
+                DataAccess.EditProject(project);
                 Console.WriteLine("Dina ändringar har sparats.");
+                Console.ReadKey();
+            }
+            else
+            {
+                Console.WriteLine("Ändringarna har inte sparats.");
                 Console.ReadKey();
             }
         }

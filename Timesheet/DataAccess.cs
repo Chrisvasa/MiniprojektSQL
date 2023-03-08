@@ -41,6 +41,40 @@ namespace Timesheet
             }
         }
 
+        public static void EditProject(ProjectModel project)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"UPDATE cva_project_person SET hours = @project_time WHERE id = @id", project);
+                cnn.Execute($"UPDATE cva_project SET project_name = @project_name WHERE id = @project_id", project);
+            }
+        }
+
+        public static void CreateUser(string user)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"INSERT INTO cva_person (person_name) VALUES ('{user}')");
+            }
+        }
+
+        internal static void EditUser(PersonModel person)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"UPDATE cva_person SET person_name = @person_name WHERE id = @person_id", person);
+            }
+        }
+
+        internal static void DeleteUser(PersonModel person)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"DELETE FROM cva_project_person WHERE person_id = @person_id", person);
+                cnn.Execute($"DELETE FROM cva_person WHERE id = @person_id", person);
+            }
+        }
+
         private static string LoadConnectionString(string id = "Default")
         {
             using (IDbConnection cnn = new NpgsqlConnection(ConfigurationManager.ConnectionStrings[id].ConnectionString))
