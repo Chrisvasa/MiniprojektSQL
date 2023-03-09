@@ -40,7 +40,7 @@ namespace Timesheet
                 return output.ToList();
             }
         }
-
+        // Loads and returns all projects from database
         public static List<ProjectModel> LoadProjects()
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))

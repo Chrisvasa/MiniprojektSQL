@@ -112,7 +112,7 @@ namespace Timesheet
                 Console.Clear();
                 Console.WriteLine("Var vänlig och skapa en ny användare.");
                 Console.Write("Namn: ");
-                string userName = Helper.FormatString(Console.ReadLine());
+                string userName = Helper.FormatString(Console.ReadLine().Trim());
                 if (Helper.isValid(userName)) // Checks if all chars in the name are valid
                 {
                     Console.WriteLine($"Du skrev in {userName} - Ser detta rätt ut? Y/N");
@@ -151,7 +151,7 @@ namespace Timesheet
             if(Helper.Confirm()) 
             {
                 Console.Write("Skriv in det nya namnet: ");
-                string userName = Helper.FormatString(Console.ReadLine());
+                string userName = Helper.FormatString(Console.ReadLine().Trim()); ;
                 Console.WriteLine($"Ditt nya namn kommer bli {userName} - Ser detta bra ut? Y/N");
                 if (Helper.isValid(userName) && Helper.Confirm())
                 {
@@ -211,12 +211,12 @@ namespace Timesheet
             bool showMenu = true;
             while (showMenu)
             {
-                int selectedOption = ProjectMenu.UseMenu();
+                int selectedOption = ProjectMenu.UseMenu(); // Returns index of the selected menu item 
                 if (selectedOption == 0)
                 {
                     ShowProjects(ProjectList);
                 }
-                else if (selectedOption != ProjectMenu.MenuItems.Length - 1) // Checks if at go back in menu
+                else if (selectedOption != ProjectMenu.MenuItems.Length - 1) // Checks if user pressed go back
                 {
                     switch (selectedOption)
                     {
@@ -298,6 +298,7 @@ namespace Timesheet
             while(showMenu)
             {
                 EditMenu.PrintMenu();
+                // Allows the user to edit both the project name and hour spent on a project
                 switch (EditMenu.UseMenu())
                 {
                     case 0:
@@ -325,7 +326,7 @@ namespace Timesheet
             {
                 if(input.Length > 0)
                 {
-                    project.project_name = Helper.FormatString(input);
+                    project.project_name = Helper.FormatString(input); // Formats the project name then updates it in the ProjectModel
                 }
                 if(hours.Length > 0)
                 {
@@ -341,7 +342,7 @@ namespace Timesheet
                 Console.ReadKey();
             }
         }
-
+        // Method to add a project to the user and set the hours spent
         private static void AddProject(List<ProjectModel> projects)
         {
             Menu AddMenu = new Menu(new string[] { "Titel: ", "Arbetstimmar: ", "Spara ändringar" ,"Gå tillbaka" });
@@ -373,15 +374,16 @@ namespace Timesheet
                 }
             }
         }
-
+        // Creates a menu that outputs the projects that are not already assigned to the selected user
+        // Then returns the selected project name
         private static string ChooseProject(List<ProjectModel> projects)
         {
             Menu ChoiceMenu = new Menu();
-            projects = ChoiceMenu.ChooseProjectMenu(projects, personList[selectedPerson].projects);
+            projects = ChoiceMenu.ChooseProjectMenu(projects, personList[selectedPerson].projects); 
             int selectedProject = ChoiceMenu.UseMenu();
             return projects[selectedProject].project_name;
         }
-
+        // Checks that both the project name and hours are correct and then prompts the user for confirmation to save the project to the database
         private static void SaveProject(string projectName, string hours)
         {
             if(Helper.isValid(projectName) && int.TryParse(hours, out int result))
@@ -396,7 +398,7 @@ namespace Timesheet
                 }
             }
         }
-
+        // Prompts the user for confirmation before removing the selected project from the users list
         private static void RemoveProject(ProjectModel project)
         {
             Console.WriteLine("Är du säker på att du vill ta bort projektet? Y/N");
