@@ -16,6 +16,7 @@ namespace Timesheet
             MainMenu.Output = "Projekthanterare";
             while (true)
             {
+                // Checks if a person is selected, and changes the menu title
                 if (selectedPerson >= 0)
                 {
                     MainMenu.Output = $"Projekthanterare för {personList[selectedPerson].person_name}";
@@ -23,10 +24,10 @@ namespace Timesheet
                 switch (MainMenu.UseMenu())
                 {
                     case 0:
-                        Users();
+                        UsersMenu(); // Menu with options to choose a user, edit, create and delete users
                         break;
                     case 1:
-                        ProjectsMenu();
+                        ProjectsMenu(); // Menu with options to show projects, edit, create and delete projects
                         break;
                     case 2:
                         Console.WriteLine("Du har avslutat programmet. Hejdå!");
@@ -36,6 +37,7 @@ namespace Timesheet
             }
         }
 
+        // Method that loads all the data about each person from the database
         private static List<PersonModel> LoadAll()
         {
             personList = DataAccess.LoadPersons();
@@ -56,7 +58,8 @@ namespace Timesheet
             }
         }
 
-        private static void Users()
+        // Menu for all the different user menu options (Choose, edit, create and remove users)
+        private static void UsersMenu()
         {
             SortList();
             Menu UserMenu = new Menu(new string[] {"Välj användare", "Redigera användare", "Skapa användare", "Ta bort användare", "Gå tillbaka"});
@@ -92,6 +95,7 @@ namespace Timesheet
             }
         }
 
+        // Outputs all the users into a menu and returns the selected persons index in the list.
         private static void SelectUser()
         {
             Menu PersonMenu = new Menu(); // Initiates our Menu
@@ -100,6 +104,7 @@ namespace Timesheet
             selectedPerson = PersonMenu.UseMenu(); // Uses menu and returns selected index from list
         }
 
+        // Method that allows for creation of new users
         private static void CreateUser()
         {
             do
@@ -108,7 +113,7 @@ namespace Timesheet
                 Console.WriteLine("Var vänlig och skapa en ny användare.");
                 Console.Write("Namn: ");
                 string userName = Helper.FormatString(Console.ReadLine());
-                if (Helper.isValid(userName))
+                if (Helper.isValid(userName)) // Checks if all chars in the name are valid
                 {
                     Console.WriteLine($"Du skrev in {userName} - Ser detta rätt ut? Y/N");
                     if(Helper.Confirm())
@@ -134,9 +139,11 @@ namespace Timesheet
             } while (true);
         }
 
+        // Allows for changing of names on current users in the database
         private static void EditUser()
         {
-            if(selectedPerson == -1)
+            // If a user has not been selected, this will allow you to do so
+            if (selectedPerson == -1)
             {
                 SelectUser();
             }
@@ -161,8 +168,10 @@ namespace Timesheet
             }
         }
 
+        // A method that allows you to delete a user from the database
         private static void DeleteUser()
         {
+            // If a user has not been selected, this will allow you to do so
             if (selectedPerson == -1)
             {
                 SelectUser();
@@ -180,6 +189,7 @@ namespace Timesheet
             }
         }
 
+        // Calls for the projects menu, if you have selected a user or tells you to select a user first
         private static void ProjectsMenu()
         {
             SortList();
@@ -196,7 +206,8 @@ namespace Timesheet
 
         private static void Projects(List<ProjectModel> ProjectList)
         {
-            Menu ProjectMenu = new Menu(new string[] { "Visa projekt", "Redigera projekt", "Lägg till projekt", "Ta bort projekt", "Gå tillbaka" });
+            List<ProjectModel> AllProjects = DataAccess.LoadProjects();
+            Menu ProjectMenu = new Menu(new string[] { "Visa projekt [" + ProjectList.Count + "]", "Redigera projekt", "Lägg till projekt", "Ta bort projekt", "Gå tillbaka" });
             bool showMenu = true;
             while (showMenu)
             {
@@ -205,20 +216,36 @@ namespace Timesheet
                 {
                     ShowProjects(ProjectList);
                 }
-                else if (selectedOption != ProjectMenu.MenuItems.Length - 1)
+                else if (selectedOption != ProjectMenu.MenuItems.Length - 1) // Checks if at go back in menu
                 {
                     switch (selectedOption)
                     {
                         case 1:
                             int selectedProject = SelectProject(ProjectList);
-                            EditProject(ProjectList[selectedProject]);
+                            if(selectedProject >= 0) 
+                            {
+                                EditProject(ProjectList[selectedProject]);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Du har för nävarande inga projekt");
+                                Console.ReadKey();
+                            }
                             break;
                         case 2:
-                            AddProject();
+                            AddProject(AllProjects);
                             break;
                         case 3:
                             selectedProject = SelectProject(ProjectList);
-                            RemoveProject(ProjectList[selectedProject]);
+                            if(selectedProject >= 0)
+                            {
+                                RemoveProject(ProjectList[selectedProject]);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Du har för nävarande inga projekt");
+                                Console.ReadKey();
+                            }
                             break;
                         default:
                             break;
@@ -231,15 +258,22 @@ namespace Timesheet
             }
         }
 
+        // A method that prompts the user with a list of project and returns the selected project
+        // If there are no projects for the user, returns a -1
         private static int SelectProject(List<ProjectModel> ProjectList)
         {
             Menu ProjectMenu = new Menu(); // Initiates our Menu
             ProjectMenu.CreateProjectMenu(ProjectList); // Creates a menu from our List
             ProjectMenu.Output = "Välj ett projekt från listan";
-            int selectedProject = ProjectMenu.UseMenu(); // Uses menu and returns selected index from list
-            return selectedProject;
+            if(ProjectList.Count > 0) // If user has projects
+            {
+                int selectedProject = ProjectMenu.UseMenu(); // Uses menu and returns selected index from list
+                return selectedProject;
+            }
+            return -1;
         }
 
+        // Prints out the users projects
         private static void ShowProjects(List<ProjectModel> items)
         {
             Console.Clear();
@@ -253,10 +287,9 @@ namespace Timesheet
             Console.ReadKey(true);
         }
 
+        // Method to allow editing a users hours on different projects
         private static void EditProject(ProjectModel project)
         {
-            // Redigera projekt
-            // Låt användaren ändra ett befintligt projekt i DBn
             Menu EditMenu = new Menu(new string[] { "Titel: " + project.project_name, "Arbetstimmar: " + project.project_time, "Spara ändringar" });
             bool showMenu = true;
             bool confirmation = false;
@@ -309,22 +342,75 @@ namespace Timesheet
             }
         }
 
-        private static void AddProject()
+        private static void AddProject(List<ProjectModel> projects)
         {
-            // Lägg till projekt
-            // Ge användaren en lista med projekt att lägga till och be sedan om tiden
-            // Kolla sedan i DataAccess ifall projektet redan existerar hos den användaren - OM inte? Lägg till. Annars skicka error till användaren
-            Menu AddMenu = new Menu(new string[] { "Titel: ", "Arbetstimmar: " });
-            AddMenu.UseMenu();
+            Menu AddMenu = new Menu(new string[] { "Titel: ", "Arbetstimmar: ", "Spara ändringar" ,"Gå tillbaka" });
+            bool showMenu = true;
+            string selected = string.Empty;
+            string hours = string.Empty;
+            while (showMenu)
+            {
+                switch (AddMenu.UseMenu())
+                {
+                    case 0:
+                        selected = ChooseProject(projects);
+                        AddMenu.SetMenuItem("Titel: " + selected, 0);
+                        AddMenu.PrintMenu();
+                        break;
+                    case 1:
+                        AddMenu.SetMenuItem("Arbetstimmar: ", 1);
+                        AddMenu.PrintMenu();
+                        AddMenu.MoveCursorRight();
+                        hours = Console.ReadLine();
+                        AddMenu.SetMenuItem("Arbetstimmar: " + hours, 1);
+                        break;
+                    case 2:
+                        SaveProject(selected, hours);
+                        break;
+                    case 3:
+                        showMenu = false;
+                        break;
+                }
+            }
+        }
+
+        private static string ChooseProject(List<ProjectModel> projects)
+        {
+            Menu ChoiceMenu = new Menu();
+            projects = ChoiceMenu.ChooseProjectMenu(projects, personList[selectedPerson].projects);
+            int selectedProject = ChoiceMenu.UseMenu();
+            return projects[selectedProject].project_name;
+        }
+
+        private static void SaveProject(string projectName, string hours)
+        {
+            if(Helper.isValid(projectName) && int.TryParse(hours, out int result))
+            {
+                Console.WriteLine($"Vill du skapa projektet med namnet {projectName} och timmarna {hours}? Y/N");
+                if(Helper.Confirm())
+                {
+                    DataAccess.AddProject(projectName, result, personList[selectedPerson].person_id);
+                    personList = LoadAll();
+                    Console.WriteLine("Projektet har nu lagts till.");
+                    Console.ReadKey();
+                }
+            }
         }
 
         private static void RemoveProject(ProjectModel project)
         {
-            // Ta bort projekt
-            // Kolla om användaren är säker på att de valt rätt projekt att ta bort
-            // Ifall svaret är ja, kalla på en metod i DataAccess som då tar bort fältet i DBn
-            Console.WriteLine(project.project_name + " - " + project.project_time);
-            Console.ReadKey();
+            Console.WriteLine("Är du säker på att du vill ta bort projektet? Y/N");
+            if(Helper.Confirm())
+            {
+                Console.WriteLine($"Denna ändring är permanent. Vill du fortsätta med borttagningen av projektet {project.project_name}? Y/N");
+                if(Helper.Confirm()) 
+                {
+                    DataAccess.RemoveProject(project);
+                    Console.WriteLine($"{project.project_name} har nu tagits bort.");
+                    Console.ReadKey();
+                    personList = LoadAll();
+                }
+            }
         }
     }
 }

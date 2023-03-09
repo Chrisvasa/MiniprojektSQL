@@ -41,12 +41,37 @@ namespace Timesheet
             }
         }
 
+        public static List<ProjectModel> LoadProjects()
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                var output = cnn.Query<ProjectModel>($@"SELECT project_name FROM cva_project");
+                return output.ToList();
+            }
+        }
+
+        internal static void AddProject(string projectName, int hours, int person)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"INSERT INTO cva_project_person (hours, project_id, person_id) VALUES ('{hours}', (SELECT id FROM cva_project WHERE project_name = '{projectName}'), '{person}')");
+            }
+        }
+
         public static void EditProject(ProjectModel project)
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
             {
                 cnn.Execute($"UPDATE cva_project_person SET hours = @project_time WHERE id = @id", project);
                 cnn.Execute($"UPDATE cva_project SET project_name = @project_name WHERE id = @project_id", project);
+            }
+        }
+
+        internal static void RemoveProject(ProjectModel project)
+        {
+            using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+            {
+                cnn.Execute($"DELETE FROM cva_project_person WHERE id = @id", project);
             }
         }
 

@@ -105,7 +105,7 @@ namespace Timesheet
         {
             Console.SetCursorPosition(0, 0);
         }
-
+        // Creates a menu from the personmodel outputting only person names
         public void CreatePersonMenu(List<PersonModel> items)
         {
             MenuItems = new string[items.Count];
@@ -114,7 +114,7 @@ namespace Timesheet
                 MenuItems[i] = items[i].person_name;
             }
         }
-
+        // Creates a menu from the projectmodel and some basic formatting to show project name and hours spent on a project
         public void CreateProjectMenu(List<ProjectModel> items)
         {
             MenuItems = new string[items.Count];
@@ -122,6 +122,34 @@ namespace Timesheet
             {
                 MenuItems[i] = String.Format("|{0,-15}|{1,0}|", items[i].project_name, items[i].project_time + "h");
             }
+        }
+        // Compares all the projects in the database with the selected persons projects
+        // And only adds the unused ones to the menu
+        public List<ProjectModel> ChooseProjectMenu(List<ProjectModel> projects, List<ProjectModel> personProjects)
+        {
+            var result = new List<ProjectModel>();
+            int match;
+            for(int i = 0; i < projects.Count; i++)
+            {
+                match = 0; // Resets the match counter
+                for(int j = 0; j < personProjects.Count; j++)
+                {
+                    if (projects[i].project_name == personProjects[j].project_name)
+                    {
+                        match++; // For each match found
+                    }
+                }
+                if(match == 0) // Only adds a project if its unique
+                {
+                    result.Add(projects[i]);
+                }
+            }
+            MenuItems = new string[result.Count];
+            for(int i = 0; i < result.Count; i++)
+            {
+                MenuItems[i] = result[i].project_name;
+            }
+            return result;
         }
 
         // A method that prints the menu when called
