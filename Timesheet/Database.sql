@@ -28,7 +28,7 @@ INSERT INTO "public"."cva_project" ("project_name") VALUES ('Programming');
 INSERT INTO "public"."cva_project_person" ("project_id", "person_id", "hours") VALUES (1, 1, 25);
 INSERT INTO "public"."cva_project_person" ("project_id", "person_id", "hours") VALUES (3, 1, 60);
 INSERT INTO "public"."cva_project_person" ("project_id", "person_id", "hours") VALUES (4, 1, 20);
-INSERT INTO "public"."cva_project_person" ("project_id", "person_id", "hours") VALUES (4, 12, 16);
+INSERT INTO "public"."cva_project_person" ("project_id", "person_id", "hours") VALUES (4, 2, 16);
 INSERT INTO "public"."cva_person" ("person_name") VALUES ('Bob');
 INSERT INTO "public"."cva_person" ("person_name") VALUES ('Fibbe');
 ALTER TABLE "public"."cva_project_person" ADD CONSTRAINT "FK_cva_project_person_project_id" FOREIGN KEY ("project_id") REFERENCES "public"."cva_project" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
