@@ -24,19 +24,17 @@ The program is a pretty basic application and at launch you are met with:
 
 - An option to Exit the program
 
-Code Structure:
+**Code Structure:**
 
-- Program.cs which only has the purpose to run the program by calling a method in Timesheet.cs
+| Method Name | Method Description |
+| ------------- | ------------- |
+| Program.cs | Which only has the purpose to run the program by calling a method in Timesheet.cs |
+| Timesheet.cs | The class that contains all the methods for the users and projects. |
+| DataAccess.cs  | A class that handles the access to the database and all the different SQL transactions to get or insert data. |
+| ProjectModel.cs and PersonModel.cs | These are used to store and to have easier access to the database data. |
+| Menu.cs | Prints out all the different menus and allows the user to interact in an easier manner with the application.|
+| InputHandler.cs | Makes sure that only correct input is given when navigating the menu system.|
 
-- Timesheet.cs contains all the methods for the users and projects.
-
-- DataAccess.cs handles the access to the database and all the different SQL transactions to get or insert data.
-
-- ProjectModel.cs and PersonModel.cs are used to store and to have easier access to the database data.
-
-- Menu.cs prints out all the different menus and allows the user to interact in an easier manner with the application.
-
-- InputHandler makes sure that only correct input is given when navigating the menu system.
 
 ## "Tech Stack"
 
