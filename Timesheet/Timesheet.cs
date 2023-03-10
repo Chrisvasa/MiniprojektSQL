@@ -8,7 +8,9 @@ namespace Timesheet
 {
     internal class Timesheet
     {
+        // Static int to see keep track of selected user in the program
         private static int selectedPerson = -1;
+        // A static list to have easier access to all the users and their projects around the program
         private static List<PersonModel> personList = LoadAll();
         public static void Run()
         {
@@ -77,16 +79,16 @@ namespace Timesheet
                 switch(UserMenu.UseMenu())
                 {
                     case 0:
-                        SelectUser();
+                        SelectUser(); // Select a user
                         break;
                     case 1:
-                        EditUser();
+                        EditUser(); // Edit a users name
                         break;
                     case 2:
-                        CreateUser();
+                        CreateUser(); // Create a new user to the database
                         break;
                     case 3:
-                        DeleteUser();
+                        DeleteUser(); // Delete a user from the database
                         break;
                     case 4:
                         showMenu = false;
@@ -211,15 +213,11 @@ namespace Timesheet
             bool showMenu = true;
             while (showMenu)
             {
-                int selectedOption = ProjectMenu.UseMenu(); // Returns index of the selected menu item 
-                if (selectedOption == 0)
-                {
-                    ShowProjects(ProjectList);
-                }
-                else if (selectedOption != ProjectMenu.MenuItems.Length - 1) // Checks if user pressed go back
-                {
-                    switch (selectedOption)
+                    switch (ProjectMenu.UseMenu())
                     {
+                        case 0:
+                            ShowProjects(ProjectList);
+                            break;
                         case 1:
                             int selectedProject = SelectProject(ProjectList);
                             if(selectedProject >= 0) 
@@ -248,13 +246,9 @@ namespace Timesheet
                             }
                             break;
                         default:
+                            showMenu = false;
                             break;
                     }
-                }
-                else
-                {
-                    showMenu = false;
-                }
             }
         }
 
@@ -322,7 +316,7 @@ namespace Timesheet
                         break;
                 }
             }
-            if(confirmation == true)
+            if(confirmation == true) // If user chose to save changes
             {
                 if(input.Length > 0)
                 {
@@ -333,6 +327,7 @@ namespace Timesheet
                     project.project_time = int.Parse(hours);
                 }
                 DataAccess.EditProject(project);
+                personList = LoadAll();
                 Console.WriteLine("Dina ändringar har sparats.");
                 Console.ReadKey();
             }
@@ -354,16 +349,16 @@ namespace Timesheet
                 switch (AddMenu.UseMenu())
                 {
                     case 0:
-                        selected = ChooseProject(projects);
-                        AddMenu.SetMenuItem("Titel: " + selected, 0);
+                        selected = ChooseProject(projects); // Prompts the user to select a project to add
+                        AddMenu.SetMenuItem("Titel: " + selected, 0); // Adds the selected project to menu output
                         AddMenu.PrintMenu();
                         break;
                     case 1:
-                        AddMenu.SetMenuItem("Arbetstimmar: ", 1);
+                        AddMenu.SetMenuItem("Arbetstimmar: ", 1); // Resets menu item when chosen
                         AddMenu.PrintMenu();
                         AddMenu.MoveCursorRight();
                         hours = Console.ReadLine();
-                        AddMenu.SetMenuItem("Arbetstimmar: " + hours, 1);
+                        AddMenu.SetMenuItem("Arbetstimmar: " + hours, 1); // Sets the menu item to user input
                         break;
                     case 2:
                         SaveProject(selected, hours);
@@ -374,6 +369,7 @@ namespace Timesheet
                 }
             }
         }
+
         // Creates a menu that outputs the projects that are not already assigned to the selected user
         // Then returns the selected project name
         private static string ChooseProject(List<ProjectModel> projects)
@@ -383,6 +379,7 @@ namespace Timesheet
             int selectedProject = ChoiceMenu.UseMenu();
             return projects[selectedProject].project_name;
         }
+
         // Checks that both the project name and hours are correct and then prompts the user for confirmation to save the project to the database
         private static void SaveProject(string projectName, string hours)
         {
@@ -396,6 +393,11 @@ namespace Timesheet
                     Console.WriteLine("Projektet har nu lagts till.");
                     Console.ReadKey();
                 }
+            }
+            else
+            {
+                Console.WriteLine("Se över dina arbetstimmar. Endast heltal samt nummer tillåtna.");
+                Console.ReadKey();
             }
         }
         // Prompts the user for confirmation before removing the selected project from the users list

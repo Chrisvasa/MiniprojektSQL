@@ -49,7 +49,7 @@ namespace Timesheet
                 return output.ToList();
             }
         }
-
+        // Adds a project for the selected user - With name and hours spent
         internal static void AddProject(string projectName, int hours, int person)
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
@@ -57,7 +57,7 @@ namespace Timesheet
                 cnn.Execute($"INSERT INTO cva_project_person (hours, project_id, person_id) VALUES ('{hours}', (SELECT id FROM cva_project WHERE project_name = '{projectName}'), '{person}')");
             }
         }
-
+        // Updates project name and hours spent on a project for the selected user
         public static void EditProject(ProjectModel project)
         {
             using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
